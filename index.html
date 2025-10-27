@@ -20,7 +20,6 @@
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            transition: background 50s linear;
         }
 
         .content {
@@ -185,33 +184,29 @@
 
         let currentPattern = breathingPatterns.box;
 
-        // Color gradient animation
-        const colorStops = [
-            ['#ff6b6b', '#4ecdc4', '#45b7d1'],
-            ['#4ecdc4', '#45b7d1', '#667eea'],
-            ['#45b7d1', '#667eea', '#764ba2'],
-            ['#667eea', '#764ba2', '#f093fb'],
-            ['#764ba2', '#f093fb', '#fe5e92'],
-            ['#f093fb', '#fe5e92', '#ff9a56'],
-            ['#fe5e92', '#ff9a56', '#ffd93d'],
-            ['#ff9a56', '#ffd93d', '#6bcf7f'],
-            ['#ffd93d', '#6bcf7f', '#51cf66'],
-            ['#6bcf7f', '#51cf66', '#4ecdc4'],
-            ['#51cf66', '#4ecdc4', '#ff6b6b'],
-            ['#4ecdc4', '#ff6b6b', '#fe5e92']
-        ];
-
-        let colorIndex = 0;
+        // Smooth continuous color gradient animation
+        let startTime = Date.now();
+        const cycleDuration = 600000; // 10 minutes in milliseconds
 
         function updateGradient() {
-            const colors = colorStops[colorIndex];
-            document.body.style.background = `linear-gradient(135deg, ${colors[0]} 0%, ${colors[1]} 50%, ${colors[2]} 100%)`;
+            const elapsed = Date.now() - startTime;
+            const progress = (elapsed % cycleDuration) / cycleDuration;
 
-            colorIndex = (colorIndex + 1) % colorStops.length;
+            // Create three hue values that shift at different rates for a complex gradient
+            const hue1 = (progress * 360) % 360;
+            const hue2 = ((progress * 360) + 120) % 360;
+            const hue3 = ((progress * 360) + 240) % 360;
+
+            // Use HSL colors for smooth transitions
+            const color1 = `hsl(${hue1}, 70%, 65%)`;
+            const color2 = `hsl(${hue2}, 65%, 60%)`;
+            const color3 = `hsl(${hue3}, 70%, 65%)`;
+
+            document.body.style.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 50%, ${color3} 100%)`;
         }
 
-        // Change gradient every 50 seconds (600s / 12 stops)
-        setInterval(updateGradient, 50000);
+        // Update gradient every 100ms for smooth animation
+        setInterval(updateGradient, 100);
         updateGradient();
 
         function updatePhase() {
