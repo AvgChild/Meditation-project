@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditative Breathing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            transition: background 50s linear;
+        }
+
+        .content {
+            text-align: center;
+            color: white;
+        }
+
+        .circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 4s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .circle.inhale {
+            transform: scale(1.5);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 60px rgba(255, 255, 255, 0.3);
+        }
+
+        .circle.hold {
+            transform: scale(1.5);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 60px rgba(255, 255, 255, 0.3);
+        }
+
+        .circle.exhale {
+            transform: scale(1);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgb(255, 255, 255);
+        }
+
+        .circle.rest {
+            transform: scale(1);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgb(255, 255, 255);
+        }
+
+        .breath-text {
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-shadow: 2px 2px 10px rgb(255, 255, 255);
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        .instruction {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            opacity: 0.9;
+            font-weight: 300;
+            color: white;
+            transition: all 4s ease-in-out;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.959);
+        }
+
+        .instruction.inhale,
+        .instruction.hold {
+            font-size: 2.5rem;
+            opacity: 1;
+        }
+
+        .instruction.exhale,
+        .instruction.rest {
+            font-size: 2rem;
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="circle" id="circle">
+            <div class="breath-text" id="breathText">Breathe</div>
+        </div>
+    </div>
+    <div class="instruction" id="instruction">Get Ready...</div>
+
+    <script>
+        const circle = document.getElementById('circle');
+        const breathText = document.getElementById('breathText');
+        const instruction = document.getElementById('instruction');
+
+        let phase = 0;
+
+        // Color gradient animation
+        const colorStops = [
+            ['#ff6b6b', '#4ecdc4', '#45b7d1'],
+            ['#4ecdc4', '#45b7d1', '#667eea'],
+            ['#45b7d1', '#667eea', '#764ba2'],
+            ['#667eea', '#764ba2', '#f093fb'],
+            ['#764ba2', '#f093fb', '#fe5e92'],
+            ['#f093fb', '#fe5e92', '#ff9a56'],
+            ['#fe5e92', '#ff9a56', '#ffd93d'],
+            ['#ff9a56', '#ffd93d', '#6bcf7f'],
+            ['#ffd93d', '#6bcf7f', '#51cf66'],
+            ['#6bcf7f', '#51cf66', '#4ecdc4'],
+            ['#51cf66', '#4ecdc4', '#ff6b6b'],
+            ['#4ecdc4', '#ff6b6b', '#fe5e92']
+        ];
+
+        let colorIndex = 0;
+
+        function updateGradient() {
+            const colors = colorStops[colorIndex];
+            document.body.style.background = `linear-gradient(135deg, ${colors[0]} 0%, ${colors[1]} 50%, ${colors[2]} 100%)`;
+
+            colorIndex = (colorIndex + 1) % colorStops.length;
+        }
+
+        // Change gradient every 50 seconds (600s / 12 stops)
+        setInterval(updateGradient, 50000);
+        updateGradient();
+
+        const phases = [
+            {
+                name: 'Inhale',
+                duration: 4000,
+                instruction: 'Breathe in slowly...',
+                class: 'inhale'
+            },
+            {
+                name: 'Hold',
+                duration: 4000,
+                instruction: 'Hold gently...',
+                class: 'hold'
+            },
+            {
+                name: 'Exhale',
+                duration: 4000,
+                instruction: 'Breathe out slowly...',
+                class: 'exhale'
+            },
+            {
+                name: 'Hold',
+                duration: 4000,
+                instruction: 'Hold and rest...',
+                class: 'rest'
+            }
+        ];
+
+        function updatePhase() {
+            const currentPhase = phases[phase];
+
+            circle.className = 'circle ' + currentPhase.class;
+            instruction.className = 'instruction ' + currentPhase.class;
+            breathText.textContent = currentPhase.name;
+            instruction.textContent = currentPhase.instruction;
+
+            setTimeout(() => {
+                phase = (phase + 1) % 4;
+                updatePhase();
+            }, currentPhase.duration);
+        }
+
+        setTimeout(updatePhase, 1000);
+    </script>
+</body>
+</html>
