@@ -99,9 +99,56 @@
             font-size: 2rem;
             opacity: 0.85;
         }
+
+        .button-container {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .breath-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 1rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .breath-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.1);
+        }
+
+        .breath-button.active {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 1);
+            box-shadow: 0 6px 25px rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
 <body>
+    <div class="button-container">
+        <button class="breath-button active" data-pattern="box">4-4-4-4</button>
+        <button class="breath-button" data-pattern="478">4-7-8</button>
+        <button class="breath-button" data-pattern="66">6-6</button>
+    </div>
+
     <div class="content">
         <div class="circle" id="circle">
             <div class="breath-text" id="breathText">Breathe</div>
@@ -115,6 +162,28 @@
         const instruction = document.getElementById('instruction');
 
         let phase = 0;
+        let currentTimeout = null;
+
+        // Breathing pattern definitions
+        const breathingPatterns = {
+            box: [
+                { name: 'Inhale', duration: 4000, instruction: 'Breathe in slowly...', class: 'inhale' },
+                { name: 'Hold', duration: 4000, instruction: 'Hold gently...', class: 'hold' },
+                { name: 'Exhale', duration: 4000, instruction: 'Breathe out slowly...', class: 'exhale' },
+                { name: 'Hold', duration: 4000, instruction: 'Hold and rest...', class: 'rest' }
+            ],
+            478: [
+                { name: 'Inhale', duration: 4000, instruction: 'Breathe in through your nose...', class: 'inhale' },
+                { name: 'Hold', duration: 7000, instruction: 'Hold gently...', class: 'hold' },
+                { name: 'Exhale', duration: 8000, instruction: 'Breathe out slowly...', class: 'exhale' }
+            ],
+            66: [
+                { name: 'Inhale', duration: 6000, instruction: 'Breathe in deeply...', class: 'inhale' },
+                { name: 'Exhale', duration: 6000, instruction: 'Breathe out completely...', class: 'exhale' }
+            ]
+        };
+
+        let currentPattern = breathingPatterns.box;
 
         // Color gradient animation
         const colorStops = [
@@ -145,48 +214,45 @@
         setInterval(updateGradient, 50000);
         updateGradient();
 
-        const phases = [
-            {
-                name: 'Inhale',
-                duration: 4000,
-                instruction: 'Breathe in slowly...',
-                class: 'inhale'
-            },
-            {
-                name: 'Hold',
-                duration: 4000,
-                instruction: 'Hold gently...',
-                class: 'hold'
-            },
-            {
-                name: 'Exhale',
-                duration: 4000,
-                instruction: 'Breathe out slowly...',
-                class: 'exhale'
-            },
-            {
-                name: 'Hold',
-                duration: 4000,
-                instruction: 'Hold and rest...',
-                class: 'rest'
-            }
-        ];
-
         function updatePhase() {
-            const currentPhase = phases[phase];
+            const currentPhase = currentPattern[phase];
 
             circle.className = 'circle ' + currentPhase.class;
             instruction.className = 'instruction ' + currentPhase.class;
             breathText.textContent = currentPhase.name;
             instruction.textContent = currentPhase.instruction;
 
-            setTimeout(() => {
-                phase = (phase + 1) % 4;
+            currentTimeout = setTimeout(() => {
+                phase = (phase + 1) % currentPattern.length;
                 updatePhase();
             }, currentPhase.duration);
         }
 
-        setTimeout(updatePhase, 1000);
+        function startBreathing() {
+            phase = 0;
+            if (currentTimeout) {
+                clearTimeout(currentTimeout);
+            }
+            setTimeout(updatePhase, 1000);
+        }
+
+        // Button handlers
+        const buttons = document.querySelectorAll('.breath-button');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const pattern = button.dataset.pattern;
+
+                // Update active state
+                buttons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Switch pattern
+                currentPattern = breathingPatterns[pattern];
+                startBreathing();
+            });
+        });
+
+        startBreathing();
     </script>
 </body>
 </html>
